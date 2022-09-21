@@ -1,20 +1,31 @@
 export default {
   namespaced: true,
   state: {
-    data: {},
+    orders: [],
   },
   getters: {
-    data: (state) => state.data,
+    orders: (state) => state.orders,
   },
   actions: {
-    async getData({ commit }) {
-      const data = await fetch("https://api.coincap.io/v2/assets");
-      commit("SET_DATA", await data.json());
+    async addOrder({ commit }, product) {
+      commit("SET_ORDER", product);
+    },
+    async deleteOrder({ commit }, index) {
+      commit("DELETE_ORDER", index);
+    },
+    async clearOrder({ commit }) {
+      commit("CLEAR_ORDER");
     },
   },
   mutations: {
-    SET_DATA(state, data) {
-      state.data = data;
+    SET_ORDER(state, product) {
+      state.orders.push(product);
+    },
+    DELETE_ORDER(state, index) {
+      state.orders.splice(index, 1);
+    },
+    CLEAR_ORDER(state) {
+      state.orders = [];
     },
   },
 };

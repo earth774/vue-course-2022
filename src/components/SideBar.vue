@@ -12,16 +12,16 @@
     <v-list flat class="mt-4">
       <v-list-item-group v-model="selectedItem" @change="changeNavigate">
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(menu, i) in menus"
           :key="i"
           active-class="border"
           :ripple="false"
         >
           <v-list-item-content>
-            <v-icon v-text="item.icon"></v-icon>
+            <v-icon v-text="menu.icon"></v-icon>
             <v-list-item-subtitle
               align="center"
-              v-text="item.text"
+              v-text="menu.text"
               class="mt-3 caption"
             ></v-list-item-subtitle>
           </v-list-item-content>
@@ -51,18 +51,24 @@ export default {
   data: () => ({
     selectedItem: 0,
     drawer: null,
-    items: [
-      { icon: "fas fa-home", text: "Home" },
-      { icon: "fas fa-hamburger", text: "Menu" },
-      { icon: "fas fa-history", text: "History" },
-      { icon: "fas fa-wallet", text: "Wallet" },
-      { icon: "fas fa-percent", text: "Promo" },
-      { icon: "fas fa-cog", text: "Setting" },
+    menus: [
+      { icon: "fas fa-home", text: "Home", path: "/" },
+      { icon: "fas fa-hamburger", text: "Menu", path: "/menu" },
+      { icon: "fas fa-history", text: "History", path: "/history" },
+      { icon: "fas fa-wallet", text: "Wallet", path: "/wallet" },
+      { icon: "fas fa-percent", text: "Promo", path: "/promo" },
+      { icon: "fas fa-cog", text: "Setting", path: "/setting" },
     ],
   }),
+  created: function () {
+    var currentUrl = window.location.pathname;
+    const index = this.menus.findIndex((data) => currentUrl == data.path);
+    this.selectedItem = index;
+  },
   methods: {
     changeNavigate() {
-      console.log(this.selectedItem);
+      const path = this.menus[this.selectedItem].path;
+      this.$router.push({ path });
     },
   },
 };

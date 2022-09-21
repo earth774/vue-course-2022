@@ -1,19 +1,23 @@
 <template>
   <v-app :style="{ background: $vuetify.theme.themes.dark.background }">
-    <ContentMenu />
+    <v-container>
+      <ProductCategory />
+      <Product />
+    </v-container>
     <SideBarRight />
   </v-app>
 </template>
 
 <script>
 import SideBarRight from "../Menu/components/SideBarRight.vue";
-import ContentMenu from "../Menu/components/ContentMenu.vue";
-
+import Product from "./components/Product.vue";
+import ProductCategory from "./components/ProductCategory.vue";
 export default {
   name: "MenuView",
   components: {
     SideBarRight,
-    ContentMenu,
+    Product,
+    ProductCategory,
   },
 };
 </script>

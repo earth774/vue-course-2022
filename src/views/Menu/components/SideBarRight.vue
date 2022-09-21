@@ -19,80 +19,52 @@
     </v-list>
 
     <!-- title -->
-    <strong class="ml-3">Bills</strong>
+    <strong class="ml-3">Bills</strong> <br />
+    <strong class="ml-3" v-if="orders.length == 0">Data not found</strong>
 
     <!-- order -->
-    <v-list subheader two-line class="mt-1">
+    <v-list
+      subheader
+      two-line
+      class="mt-1"
+      v-for="(order, index) in orders"
+      :key="index"
+    >
       <v-list-item>
         <v-list-item-avatar rounded color="grey lighten-4">
-          <v-img :src="require(`@/assets/images/2.png`)"></v-img>
+          <v-img :src="order.image_path"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title class="subtitle-2"
-            >Caramel Frappuccino</v-list-item-title
-          >
+          <v-list-item-title class="subtitle-2">{{
+            order.name
+          }}</v-list-item-title>
           <v-list-item-subtitle
             >X1
-            <v-btn plain color="#704232" small
-              >Notes
-              <v-icon right>mdi-pencil</v-icon>
+            <v-btn plain color="#FF0000" small @click="deleteOrder(index)"
+              >Delete
+              <v-icon right>mdi-trash-can-outline</v-icon>
             </v-btn>
           </v-list-item-subtitle>
         </v-list-item-content>
-        <v-list-item-action class="caption">$3.95</v-list-item-action>
-      </v-list-item>
-    </v-list>
-    <v-list subheader two-line class="mt-1">
-      <v-list-item>
-        <v-list-item-avatar rounded color="grey lighten-4">
-          <v-img :src="require(`@/assets/images/3.png`)"></v-img>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title class="subtitle-2"
-            >Chocolate Frappuccino</v-list-item-title
-          >
-          <v-list-item-subtitle
-            >X2
-            <v-btn plain color="#704232" small
-              >Notes
-              <v-icon right>mdi-pencil</v-icon>
-            </v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action class="caption">$9.02</v-list-item-action>
-      </v-list-item>
-    </v-list>
-    <v-list subheader two-line class="mt-1">
-      <v-list-item>
-        <v-list-item-avatar rounded color="grey lighten-4">
-          <v-img :src="require(`@/assets/images/3.png`)"></v-img>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title class="subtitle-2"
-            >Peppermint Macchiato</v-list-item-title
-          >
-          <v-list-item-subtitle
-            >X1
-            <v-btn plain color="#704232" small
-              >Notes
-              <v-icon right>mdi-pencil</v-icon>
-            </v-btn>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action class="caption">$5.34</v-list-item-action>
+        <v-list-item-action class="caption">{{
+          order.price | price
+        }}</v-list-item-action>
       </v-list-item>
     </v-list>
 
     <!-- Caculate Total money -->
     <v-toolbar color="rgba(0,0,0,0)" flat>
-      <strong>Subtotal</strong><v-spacer></v-spacer><strong>$18.31</strong>
+      <strong>Subtotal</strong><v-spacer></v-spacer
+      ><strong>{{ detectTotalPrice | price }}</strong>
     </v-toolbar>
     <v-toolbar color="rgba(0,0,0,0)" flat class="mt-n6">
-      <span>Tax(10%)</span><v-spacer></v-spacer><span>$1.831</span>
+      <span>Tax(7%)</span><v-spacer></v-spacer
+      ><span>{{ detectTax | price }}</span>
     </v-toolbar>
     <v-divider class="mx-4"></v-divider>
     <v-toolbar color="rgba(0,0,0,0)" flat>
-      <strong>Total</strong><v-spacer></v-spacer><strong>$20.141</strong>
+      <strong>Total</strong><v-spacer></v-spacer
+      ><strong>{{ detectTotalPriceTax | price }}</strong>
     </v-toolbar>
     <strong class="ml-5">Payment Method</strong>
     <v-item-group mandatory class="mt-n1">
@@ -198,7 +170,12 @@
       </v-container>
     </v-item-group>
     <div class="mx-3 mt-2">
-      <v-btn color="#704232" block dark class="widthoutupercase"
+      <v-btn
+        color="#704232"
+        block
+        dark
+        class="widthoutupercase"
+        @click="clearOrder"
         >Print Bills</v-btn
       >
     </div>
@@ -206,7 +183,55 @@
 </template>
 
 <script>
-export default {};
+import { mapActions, mapGetters } from "vuex";
+export default {
+  name: "SideBarRight",
+  data() {
+    return {
+      tax: 0,
+    };
+  },
+  filters: {
+    price: function (value) {
+      return `${value} บาท`;
+    },
+  },
+  computed: {
+    ...mapGetters({
+      orders: "order/orders",
+    }),
+    detectTotalPrice() {
+      return this.calculateTotalPrice();
+    },
+    detectTax() {
+      return this.calculateTax();
+    },
+    detectTotalPriceTax() {
+      return (
+        parseFloat(this.calculateTotalPrice()) + parseFloat(this.calculateTax())
+      );
+    },
+  },
+  mounted() {
+    console.log(this.orders);
+  },
+  methods: {
+    ...mapActions({
+      clearOrder: "order/clearOrder",
+      deleteOrder: "order/deleteOrder",
+    }),
+    calculateTotalPrice() {
+      let totalPrice = 0;
+      for (const order of this.orders) {
+        totalPrice += order.price;
+      }
+      return totalPrice;
+    },
+    calculateTax() {
+      return (this.calculateTotalPrice() * (7 / 100)).toFixed(2);
+    },
+  },
+};
 </script>
 
 <style scoped>
